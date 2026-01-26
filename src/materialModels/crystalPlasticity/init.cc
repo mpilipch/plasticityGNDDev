@@ -247,7 +247,7 @@ void crystalPlasticity<dim>::init(unsigned int num_quad_points)
 
 
   Vector<double> s0_init (n_Tslip_systems_SinglePhase);
-  std::vector<double> twin_init(n_twin_systems_SinglePhase),slip_init(n_slip_systems_SinglePhase);
+  std::vector<double> twin_init(n_twin_systems_SinglePhase),slip_init(n_slip_systems_SinglePhase),gnd_init(n_slip_systems_SinglePhase);
   Vector<double> s0_init1,s0_init2,s0_init3,s0_init4;
   Vector<double> stateVar_init,stateVar_init1, stateVar_init2, stateVar_init3, stateVar_init4;
   std::vector<double> twin_init1,slip_init1;
@@ -264,6 +264,10 @@ void crystalPlasticity<dim>::init(unsigned int num_quad_points)
 
   for (unsigned int i=0;i<n_slip_systems_SinglePhase;i++){
     slip_init[i]=0.0;
+  }
+
+  for (unsigned int i=0;i<n_slip_systems_SinglePhase;i++){
+    gnd_init[i]=0.0;
   }
 
   Vector<double> W_kh_init(n_Tslip_systems_SinglePhase);
@@ -322,6 +326,8 @@ void crystalPlasticity<dim>::init(unsigned int num_quad_points)
     twin_ouput.resize(num_local_cells, std::vector<double>(num_quad_points,0.0));
     twin_conv.resize(num_local_cells,std::vector<unsigned int>(num_quad_points,0));
     twin_iter.resize(num_local_cells,std::vector<unsigned int>(num_quad_points,0));
+    gndDensityPSS.resize(num_local_cells,std::vector<std::vector<double>>(num_quad_points,gnd_init));
+    gndDensity.resize(num_local_cells,std::vector<double>(num_quad_points,0.0));
 
     if (this->userInputs.enableUserMaterialModel){
       stateVar_conv.resize(num_local_cells,std::vector<Vector<double> >(num_quad_points,stateVar_init));

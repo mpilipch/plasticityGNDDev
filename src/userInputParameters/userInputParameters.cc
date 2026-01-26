@@ -259,7 +259,12 @@ pcout (std::cout, dealii::Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)==0)
   elasticStiffness1.push_back(dealii::Utilities::string_to_double(dealii::Utilities::split_string_list(parameter_handler.get("Elastic Stiffness row 4"))));
   elasticStiffness1.push_back(dealii::Utilities::string_to_double(dealii::Utilities::split_string_list(parameter_handler.get("Elastic Stiffness row 5"))));
   elasticStiffness1.push_back(dealii::Utilities::string_to_double(dealii::Utilities::split_string_list(parameter_handler.get("Elastic Stiffness row 6"))));
-
+  
+  gndOutputFlag = parameter_handler.get_bool("GND Output");
+  if (gndOutputFlag){
+      burgVecMags = dealii::Utilities::string_to_double(dealii::Utilities::split_string_list(parameter_handler.get("Burgers Vectors")));
+  }
+  
   enableAdvRateDepModel = parameter_handler.get_bool("Advanced Rate Dependent Model enabled");
   numSlipSystems1=parameter_handler.get_integer("Number of Slip Systems");
 

@@ -15,6 +15,7 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 	Vector<double> userDefinedAverageOutput,local_userDefinedAverageOutput;
   FullMatrix<double> P_LastIter(dim,dim);
   FullMatrix<double> F_lastIter(dim,dim),deltaF(dim,dim);
+  FullMatrix<double> sModMat;
 
 	if (this->userInputs.flagUserDefinedAverageOutput){
 		userDefinedAverageOutput.reinit(this->userInputs.numberUserDefinedAverageOutput);
@@ -38,6 +39,11 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 			}
 		}
 	}
+	const unsigned int degree = fe_values.get_fe().tensor_degree();
+	FE_Q<dim> fe_temp(degree);
+	const unsigned int projDof = fe_temp.dofs_per_cell;
+	QGauss<dim>  lhs_quad(degree + 2);
+	FETools::compute_projection_from_quadrature_points_matrix(fe_temp, lhs_quad, quadrature, sModMat);
 	//loop over elements
 	unsigned int cellID = 0;
 	typename DoFHandler<dim>::active_cell_iterator cell = this->dofHandler.begin_active(), endc = this->dofHandler.end();
@@ -73,7 +79,7 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 					Ulocal[i] = this->solutionWithGhosts[local_dof_indices[i]];
 				}
 			}
-      P_LastIter=0;workDensity_Element1_Tr=0;
+			P_LastIter=0;workDensity_Element1_Tr=0;
 			for (unsigned int q = 0; q < num_quad_points; ++q) {
 				//Get deformation gradient
 				F = 0.0;
@@ -244,7 +250,12 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 					}
 				}
 
-        F_lastIter_Global[cellID][q]=F;
+				F_lastIter_Global[cellID][q]=F;
+
+				if (this->userInputs.gndOutputFlag){
+					//std::cout << "Solving for GND at Increment " << this->currentIncrement << "For slip system " << i << std::endl;
+					computeGND(cellID, q, fe_values, sModMat, num_quad_points, projDof);
+				}
 			}
 			if (this->userInputs.writeOutput){
 //Calculation of work density for the cell
@@ -421,6 +432,10 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 							temp.push_back(TinterStress_diff[cellID][q][1][1]);
 							temp.push_back(TinterStress_diff[cellID][q][2][0]);
 							temp.push_back(TinterStress_diff[cellID][q][2][1]);
+						}
+
+						if(this->userInputs.gndOutputFlag){
+							temp.push_back(gndDensity[cellID][q]);
 						}
 
 						temp.push_back(slipfraction_conv[cellID][q][0]);

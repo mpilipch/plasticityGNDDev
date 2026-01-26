@@ -174,7 +174,10 @@ public:
   std::vector<double> UserMatConstants1; // 	Elastic Stiffness Matrix -Voigt Notation (MPa)
   std::vector<double> UserMatStateVar1; // 	Elastic Stiffness Matrix -Voigt Notation (MPa)
 
-
+  /* GND parameters*/
+  bool gndOutputFlag; // Flag to indicate if GND output is required
+  std::vector<double> burgVecMags; // Burgers vector magnitudes in (m)
+  
   //Elastic Parameters
   std::vector<std::vector<double>> elasticStiffness1; // 	Elastic Stiffness Matrix -Voigt Notation (MPa)
 

@@ -81,6 +81,7 @@ private:
   void updateBeforeIncrement();
   void writeQuadratureOutput(std::string _outputDirectory, unsigned int _currentIncrement);
   void addToQuadratureOutput(std::vector<double>& _QuadOutputs);
+  void computeGND(unsigned int cellID, unsigned int quadPtID, FEValues<dim>&fe_values, FullMatrix<double> &sModMat, const unsigned int &qptCt, const unsigned int &locDoft);
   /**
   *calculates the rotation matrix (OrientationMatrix) from the rodrigues vector (r)
   */
@@ -177,6 +178,14 @@ private:
   * volume averaged global Lagrangian strain
   */
   FullMatrix<double> global_strain;
+  /** 
+  * GND Density
+  */ 
+  std::vector<std::vector<std::vector<double>>> gndDensityPSS;
+  /** 
+  * GND Density Per Slip System
+  */ 
+  std::vector<std::vector<double>> gndDensity;
   /**
   * Tangent modulus dPK1/dF
   */
