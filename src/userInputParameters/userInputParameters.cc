@@ -259,7 +259,7 @@ pcout (std::cout, dealii::Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)==0)
   elasticStiffness1.push_back(dealii::Utilities::string_to_double(dealii::Utilities::split_string_list(parameter_handler.get("Elastic Stiffness row 4"))));
   elasticStiffness1.push_back(dealii::Utilities::string_to_double(dealii::Utilities::split_string_list(parameter_handler.get("Elastic Stiffness row 5"))));
   elasticStiffness1.push_back(dealii::Utilities::string_to_double(dealii::Utilities::split_string_list(parameter_handler.get("Elastic Stiffness row 6"))));
-  
+
   gndOutputFlag = parameter_handler.get_bool("GND Output");
   if (gndOutputFlag){
       burgVecMags = dealii::Utilities::string_to_double(dealii::Utilities::split_string_list(parameter_handler.get("Burgers Vectors")));
@@ -777,6 +777,9 @@ void userInputParameters::declare_parameters(dealii::ParameterHandler & paramete
   parameter_handler.declare_entry("Elastic Stiffness row 4","",dealii::Patterns::List(dealii::Patterns::Double()),"	Elastic Stiffness Matrix -Voigt Notation (MPa)");
   parameter_handler.declare_entry("Elastic Stiffness row 5","",dealii::Patterns::List(dealii::Patterns::Double()),"	Elastic Stiffness Matrix -Voigt Notation (MPa)");
   parameter_handler.declare_entry("Elastic Stiffness row 6","",dealii::Patterns::List(dealii::Patterns::Double()),"	Elastic Stiffness Matrix -Voigt Notation (MPa)");
+
+  parameter_handler.declare_entry("GND Output","false",dealii::Patterns::Bool(),"Flag to compute GND densities");
+  parameter_handler.declare_entry("Burgers Vectors","",dealii::Patterns::List(dealii::Patterns::Double()),"Burgers vector magnitudes per slip system");
 
   parameter_handler.declare_entry("Advanced Rate Dependent Model enabled","false",dealii::Patterns::Bool(),"Flag to indicate if Advanced Rate Dependent Model enabled");
   parameter_handler.declare_entry("Number of Slip Systems","-1",dealii::Patterns::Integer(),"Number of Slip Systems");
