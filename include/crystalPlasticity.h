@@ -81,7 +81,7 @@ private:
   void updateBeforeIncrement();
   void writeQuadratureOutput(std::string _outputDirectory, unsigned int _currentIncrement);
   void addToQuadratureOutput(std::vector<double>& _QuadOutputs);
-  void computeGND(unsigned int cellID, unsigned int quadPtID, FEValues<dim>&fe_values, FullMatrix<double> &sModMat, const unsigned int &qptCt, const unsigned int &locDoft);
+  void computeGND(unsigned int cellID, unsigned int quadPtID, FEValues<dim>&fe_values_temp, FullMatrix<double> &sModMat, const unsigned int &qptCt, const unsigned int &locDoft);
   /**
   *calculates the rotation matrix (OrientationMatrix) from the rodrigues vector (r)
   */

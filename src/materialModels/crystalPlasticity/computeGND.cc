@@ -2,8 +2,9 @@
 /* Based on the small deformation formulation*/
 
 template <int dim>
-void crystalPlasticity<dim>::computeGND(unsigned int cellID, unsigned int quadPtID, FEValues<dim>&fe_values, FullMatrix<double> &sModMat, const unsigned int &qptCt, const unsigned int &locDoft)
+void crystalPlasticity<dim>::computeGND(unsigned int cellID, unsigned int quadPtID, FEValues<dim>&fe_values_temp, FullMatrix<double> &sModMat, const unsigned int &qptCt, const unsigned int &locDoft)
 {
+    gndDensity[cellID][quadPtID] = 0.0;
     //std::cout << "Suceessfully in the GND Function" << std::endl;
  
     // Cross product result of the slip plane normals
@@ -13,18 +14,18 @@ void crystalPlasticity<dim>::computeGND(unsigned int cellID, unsigned int quadPt
         smTen[i] = 0.0;
 
         if(dim == 3){
-        smTen[i][0][1] = n_alpha[i][2];
-        smTen[i][0][2] = n_alpha[i][1] * -1;
+        smTen[i](0,1) = n_alpha[i][2];
+        smTen[i](0,2) = n_alpha[i][1] * -1;
         
-        smTen[i][1][0] = n_alpha[i][0] * -1;
-        smTen[i][1][2] = n_alpha[i][0];
+        smTen[i](1,0) = n_alpha[i][2] * -1;
+        smTen[i](1,2) = n_alpha[i][0];
 
-        smTen[i][2][0] = n_alpha[i][1];
-        smTen[i][2][1] = n_alpha[i][2] * -1;
+        smTen[i](2,0) = n_alpha[i][1];
+        smTen[i](2,1) = n_alpha[i][0] * -1;
         }
         else if(dim == 2){
-        smTen[i][0][1] = n_alpha[i][1] * -1;
-        smTen[i][1][0] = n_alpha[i][0];}
+        smTen[i](0,1) = n_alpha[i][1] * -1;
+        smTen[i](1,0) = n_alpha[i][0];}
     }
 
     // Rotation matrix of the crystal orientation
@@ -55,7 +56,7 @@ void crystalPlasticity<dim>::computeGND(unsigned int cellID, unsigned int quadPt
             
         // Note - this is on our "single dof" per node FE, so using qptCt for dofs_per_cell
         for(unsigned int d = 0; d < locDoft; d++){
-            grad_gamma += fe_values.shape_grad(d,quadPtID) * slipNodal[d];
+            grad_gamma += fe_values_temp.shape_grad(d,quadPtID) * slipNodal[d];
         }
         
         

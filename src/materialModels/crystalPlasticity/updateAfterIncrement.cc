@@ -13,9 +13,9 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 	double lowerBuffer,upperBuffer,workDensity_Element1_Tr;
 	Point<dim> pnt2;
 	Vector<double> userDefinedAverageOutput,local_userDefinedAverageOutput;
-  FullMatrix<double> P_LastIter(dim,dim);
-  FullMatrix<double> F_lastIter(dim,dim),deltaF(dim,dim);
-  FullMatrix<double> sModMat;
+	FullMatrix<double> P_LastIter(dim,dim);
+	FullMatrix<double> F_lastIter(dim,dim),deltaF(dim,dim);
+	FullMatrix<double> sModMat;
 
 	if (this->userInputs.flagUserDefinedAverageOutput){
 		userDefinedAverageOutput.reinit(this->userInputs.numberUserDefinedAverageOutput);
@@ -44,6 +44,8 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 	const unsigned int projDof = fe_temp.dofs_per_cell;
 	QGauss<dim>  lhs_quad(degree + 2);
 	FETools::compute_projection_from_quadrature_points_matrix(fe_temp, lhs_quad, quadrature, sModMat);
+	FEValues<dim> fe_values_temp(fe_temp, quadrature, update_gradients | update_quadrature_points);
+
 	//loop over elements
 	unsigned int cellID = 0;
 	typename DoFHandler<dim>::active_cell_iterator cell = this->dofHandler.begin_active(), endc = this->dofHandler.end();
@@ -254,7 +256,8 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 
 				if (this->userInputs.gndOutputFlag){
 					//std::cout << "Solving for GND at Increment " << this->currentIncrement << "For slip system " << i << std::endl;
-					computeGND(cellID, q, fe_values, sModMat, num_quad_points, projDof);
+					fe_values_temp.reinit(cell);
+					computeGND(cellID, q, fe_values_temp, sModMat, num_quad_points, projDof);
 				}
 			}
 			if (this->userInputs.writeOutput){
