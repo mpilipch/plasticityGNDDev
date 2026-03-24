@@ -198,7 +198,7 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 					this->postprocessValues(cellID, q, 2, 0) = twin_ouput[cellID][q];
 
 					////////User Defined Variables for visualization outputs (output_Var1 to output_Var24)////////
-					this->postprocessValues(cellID, q, 3, 0) = 0;
+					this->postprocessValues(cellID, q, 3, 0) = gndDensityEl[cellID];
 					this->postprocessValues(cellID, q, 4, 0) = 0;
 					this->postprocessValues(cellID, q, 5, 0) = 0;
 					this->postprocessValues(cellID, q, 6, 0) = 0;
@@ -271,7 +271,7 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 //////////////////////////////////////////////////////////////////////////
 				this->postprocessValuesAtCellCenters(cellID,0)=cellOrientationMap[cellID];
 ////////User Defined Variables for visualization outputs for cell_centers (outputoutputCellCenters_Var1 to outputoutputCellCenters_Var24)////////
-				this->postprocessValuesAtCellCenters(cellID,1)= gndDensityEl[cellID];   //This outputs cell average work density
+				this->postprocessValuesAtCellCenters(cellID,1)=gndDensityEl[cellID];   //This outputs cell average work density
 				this->postprocessValuesAtCellCenters(cellID,2)=0;
 				this->postprocessValuesAtCellCenters(cellID,3)=0;
 				this->postprocessValuesAtCellCenters(cellID,4)=0;
