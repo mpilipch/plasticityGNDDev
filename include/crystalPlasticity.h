@@ -179,13 +179,17 @@ private:
   */
   FullMatrix<double> global_strain;
   /** 
-  * GND Density
+  * GND Density Per Slip System
   */ 
   std::vector<std::vector<std::vector<double>>> gndDensityPSS;
   /** 
-  * GND Density Per Slip System
+  * GND Density Per Quadrature Point
   */ 
   std::vector<std::vector<double>> gndDensity;
+  /** 
+  * GND Density Per Element
+  */ 
+  Vector<double> gndDensityEl;
   /**
   * Tangent modulus dPK1/dF
   */

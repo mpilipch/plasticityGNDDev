@@ -74,10 +74,10 @@ void crystalPlasticity<dim>::computeGND(unsigned int cellID, unsigned int quadPt
 
         gndDensityPSS[cellID][quadPtID][i] = curGNDVec.l2_norm() / this->userInputs.burgVecMags[i];
         gndDensity[cellID][quadPtID] += gndDensityPSS[cellID][quadPtID][i];
-        
-        
         // std::cout << "Current Burgers Vector: " << this->userInputs.burgVecMags[i] << std::endl;
     }
+    
+    gndDensityEl[cellID] += gndDensity[cellID][quadPtID] * fe_values_temp.JxW(quadPtID);
 
 }
 

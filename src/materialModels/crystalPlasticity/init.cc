@@ -316,8 +316,8 @@ void crystalPlasticity<dim>::init(unsigned int num_quad_points)
     F_lastIter_Global.resize(num_local_cells,std::vector<FullMatrix<double> >(num_quad_points,IdentityMatrix(dim)));
     FirstPiolaStress.resize(num_local_cells,std::vector<FullMatrix<double> >(num_quad_points,CauchyStress_init));
     workDensityTotal1_Tr.reinit(num_local_cells); workDensityTotal1_Tr = 0.0;
-	 TinterStress.resize(num_local_cells,std::vector<FullMatrix<double> >(num_quad_points,TinterStress_init));
-	 TinterStress_diff.resize(num_local_cells,std::vector<FullMatrix<double> >(num_quad_points,TinterStress_diff_init));
+    TinterStress.resize(num_local_cells,std::vector<FullMatrix<double> >(num_quad_points,TinterStress_init));
+    TinterStress_diff.resize(num_local_cells,std::vector<FullMatrix<double> >(num_quad_points,TinterStress_diff_init));
     s_alpha_iter.resize(num_local_cells,std::vector<Vector<double> >(num_quad_points,s0_init));
     twinfraction_iter.resize(num_local_cells,std::vector<std::vector<double> >(num_quad_points,twin_init));
     slipfraction_iter.resize(num_local_cells,std::vector<std::vector<double> >(num_quad_points,slip_init));
@@ -328,6 +328,7 @@ void crystalPlasticity<dim>::init(unsigned int num_quad_points)
     twin_iter.resize(num_local_cells,std::vector<unsigned int>(num_quad_points,0));
     gndDensityPSS.resize(num_local_cells,std::vector<std::vector<double>>(num_quad_points,gnd_init));
     gndDensity.resize(num_local_cells,std::vector<double>(num_quad_points,0.0));
+    gndDensityEl.reinit(num_local_cells); gndDensityEl = 0.0;
 
     if (this->userInputs.enableUserMaterialModel){
       stateVar_conv.resize(num_local_cells,std::vector<Vector<double> >(num_quad_points,stateVar_init));
