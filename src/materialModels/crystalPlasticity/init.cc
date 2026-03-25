@@ -328,7 +328,7 @@ void crystalPlasticity<dim>::init(unsigned int num_quad_points)
     twin_iter.resize(num_local_cells,std::vector<unsigned int>(num_quad_points,0));
     gndDensityPSS.resize(num_local_cells,std::vector<std::vector<double>>(num_quad_points,gnd_init));
     gndDensity.resize(num_local_cells,std::vector<double>(num_quad_points,0.0));
-    gndDensityEl.reinit(num_local_cells); gndDensityEl = 0.0;
+//    gndDensityEl.reinit(num_local_cells,0.0);
 
     if (this->userInputs.enableUserMaterialModel){
       stateVar_conv.resize(num_local_cells,std::vector<Vector<double> >(num_quad_points,stateVar_init));

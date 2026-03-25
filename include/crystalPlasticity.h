@@ -187,9 +187,9 @@ private:
   */ 
   std::vector<std::vector<double>> gndDensity;
   /** 
-  * GND Density Per Element
+  * GND Density Per
   */ 
-  Vector<double> gndDensityEl;
+  //Vector<double> gndDensityEl;
   /**
   * Tangent modulus dPK1/dF
   */

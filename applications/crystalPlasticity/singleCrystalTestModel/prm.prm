@@ -71,7 +71,7 @@ set Skip Quadrature Output Steps = 100
 set Tabular Output = true
 
 #set Tabular Periodic Time Table
-set Tabular Time Output Table  = 0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1
+set Tabular Time Output Table  = 0.2,0.5,1
 
 ####################################
 # Boundary condition information

@@ -45,7 +45,9 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 	QGauss<dim>  lhs_quad(degree + 2);
 	FETools::compute_projection_from_quadrature_points_matrix(fe_temp, lhs_quad, quadrature, sModMat);
 	FEValues<dim> fe_values_temp(fe_temp, quadrature, update_gradients | update_quadrature_points);
-	gndDensityEl = 0.0;
+
+//	std::cout << "About to reach reset"<< std::endl;
+//	gndDensityEl = 0.0;
 
 	//loop over elements
 	unsigned int cellID = 0;
@@ -198,7 +200,7 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 					this->postprocessValues(cellID, q, 2, 0) = twin_ouput[cellID][q];
 
 					////////User Defined Variables for visualization outputs (output_Var1 to output_Var24)////////
-					this->postprocessValues(cellID, q, 3, 0) = gndDensityEl[cellID];
+					this->postprocessValues(cellID, q, 3, 0) = 0;
 					this->postprocessValues(cellID, q, 4, 0) = 0;
 					this->postprocessValues(cellID, q, 5, 0) = 0;
 					this->postprocessValues(cellID, q, 6, 0) = 0;
@@ -255,6 +257,7 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 
 				F_lastIter_Global[cellID][q]=F;
 
+				
 				if (this->userInputs.gndOutputFlag){
 					//std::cout << "Solving for GND at Increment " << this->currentIncrement << "For slip system " << i << std::endl;
 					fe_values_temp.reinit(cell);
@@ -262,7 +265,7 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 				}
 			}
 			//Already set to zero earlier, so even if not using it, shouldn't cause issue
-			gndDensityEl[cellID] /= cell->measure();
+//			gndDensityEl[cellID] /= cell->measure();
 
 			if (this->userInputs.writeOutput){
 			//Calculation of work density for the cell
@@ -271,7 +274,7 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 //////////////////////////////////////////////////////////////////////////
 				this->postprocessValuesAtCellCenters(cellID,0)=cellOrientationMap[cellID];
 ////////User Defined Variables for visualization outputs for cell_centers (outputoutputCellCenters_Var1 to outputoutputCellCenters_Var24)////////
-				this->postprocessValuesAtCellCenters(cellID,1)=gndDensityEl[cellID];   //This outputs cell average work density
+				this->postprocessValuesAtCellCenters(cellID,1)=0;   //This outputs 
 				this->postprocessValuesAtCellCenters(cellID,2)=0;
 				this->postprocessValuesAtCellCenters(cellID,3)=0;
 				this->postprocessValuesAtCellCenters(cellID,4)=0;
