@@ -5,7 +5,6 @@ template <int dim>
 void crystalPlasticity<dim>::computeGND(unsigned int cellID, unsigned int quadPtID, FEValues<dim>&fe_values_temp, FullMatrix<double> &sModMat, const unsigned int &qptCt, const unsigned int &locDoft)
 {
     gndDensity[cellID][quadPtID] = 0.0;
-    //std::cout << "Suceessfully in the GND Function" << std::endl;
  
     // Cross product result of the slip plane normals
     std::vector<FullMatrix<double>> smTen(this->n_slip_systems, FullMatrix<double>(dim,dim));
@@ -68,17 +67,10 @@ void crystalPlasticity<dim>::computeGND(unsigned int cellID, unsigned int quadPt
                 curGNDVec[r] += SG[r][c]*grad_gamma[c];
             }
         }
-        //curGNDVec[0] = SG[0][0]*grad_gamma[0] + SG[0][1]*grad_gamma[1] + SG[0][2]*grad_gamma[2];
-        //curGNDVec[1] = SG[1][0]*grad_gamma[0] + SG[1][1]*grad_gamma[1] + SG[1][2]*grad_gamma[2];
-        //curGNDVec[2] = SG[2][0]*grad_gamma[0] + SG[2][1]*grad_gamma[1] + SG[2][2]*grad_gamma[2];
 
         gndDensityPSS[cellID][quadPtID][i] = curGNDVec.l2_norm() / this->userInputs.burgVecMags[i];
         gndDensity[cellID][quadPtID] += gndDensityPSS[cellID][quadPtID][i];
-        // std::cout << "Current Burgers Vector: " << this->userInputs.burgVecMags[i] << std::endl;
 
-        
-//        std::cout << "JxW " << fe_values_temp.JxW(quadPtID) << std::endl;
-//        gndDensityEl[cellID] += gndDensity[cellID][quadPtID] * fe_values_temp.JxW(quadPtID);
     }
 
 }
