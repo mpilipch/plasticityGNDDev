@@ -1010,8 +1010,8 @@ void crystalPlasticity<dim>::init(unsigned int num_quad_points)
     F_lastIter_Global.resize(num_local_cells,std::vector<FullMatrix<double> >(num_quad_points,IdentityMatrix(dim)));
     FirstPiolaStress.resize(num_local_cells,std::vector<FullMatrix<double> >(num_quad_points,CauchyStress_init));
     workDensityTotal1_Tr.reinit(num_local_cells); workDensityTotal1_Tr = 0.0;
-	TinterStress.resize(num_local_cells,std::vector<FullMatrix<double> >(num_quad_points,TinterStress_init));
-	TinterStress_diff.resize(num_local_cells,std::vector<FullMatrix<double> >(num_quad_points,TinterStress_diff_init));
+    TinterStress.resize(num_local_cells,std::vector<FullMatrix<double> >(num_quad_points,TinterStress_init));
+    TinterStress_diff.resize(num_local_cells,std::vector<FullMatrix<double> >(num_quad_points,TinterStress_diff_init));
     s_alpha_conv.resize(num_local_cells,std::vector<Vector<double> >(num_quad_points,s0_init1));
     W_kh_conv.resize(num_local_cells, std::vector<Vector<double> >(num_quad_points, W_kh_init1));
     W_kh_iter.resize(num_local_cells, std::vector<Vector<double> >(num_quad_points, W_kh_init1));
@@ -1193,6 +1193,26 @@ void crystalPlasticity<dim>::init(unsigned int num_quad_points)
 
   N_qpts=num_quad_points;
   initCalled=true;
+
+  curlN.resize(n_slip_systems_SinglePhase, FullMatrix<double>(dim,dim));
+  for(unsigned int i = 0; i < n_slip_systems_SinglePhase; i++){
+
+      curlN[i] = 0.0;
+
+      if(dim == 3){
+      curlN[i](0,1) = n_alpha_SinglePhase[i][2];
+      curlN[i](0,2) = n_alpha_SinglePhase[i][1] * -1;
+      
+      curlN[i](1,0) = n_alpha_SinglePhase[i][2] * -1;
+      curlN[i](1,2) = n_alpha_SinglePhase[i][0];
+
+      curlN[i](2,0) = n_alpha_SinglePhase[i][1];
+      curlN[i](2,1) = n_alpha_SinglePhase[i][0] * -1;
+      }
+      else if(dim == 2){
+      curlN[i](0,1) = n_alpha_SinglePhase[i][1] * -1;
+      curlN[i](1,0) = n_alpha_SinglePhase[i][0];}
+  }
 
 }
 

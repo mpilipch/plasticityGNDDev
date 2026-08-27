@@ -6,27 +6,6 @@ void crystalPlasticity<dim>::computeGND(unsigned int cellID, unsigned int quadPt
 {
     gndDensity[cellID][quadPtID] = 0.0;
  
-    // Cross product result of the slip plane normals
-    std::vector<FullMatrix<double>> smTen(this->n_slip_systems, FullMatrix<double>(dim,dim));
-    for(unsigned int i = 0; i < this->n_slip_systems; i++){
-
-        smTen[i] = 0.0;
-
-        if(dim == 3){
-        smTen[i](0,1) = n_alpha[i][2];
-        smTen[i](0,2) = n_alpha[i][1] * -1;
-        
-        smTen[i](1,0) = n_alpha[i][2] * -1;
-        smTen[i](1,2) = n_alpha[i][0];
-
-        smTen[i](2,0) = n_alpha[i][1];
-        smTen[i](2,1) = n_alpha[i][0] * -1;
-        }
-        else if(dim == 2){
-        smTen[i](0,1) = n_alpha[i][1] * -1;
-        smTen[i](1,0) = n_alpha[i][0];}
-    }
-
     // Rotation matrix of the crystal orientation
     FullMatrix<double> tempR1(dim,dim),SG(dim,dim);  // Temporary Matrices
     tempR1=0.0; SG=0.0;
@@ -40,7 +19,7 @@ void crystalPlasticity<dim>::computeGND(unsigned int cellID, unsigned int quadPt
     for(unsigned int i = 0; i < this->n_slip_systems; i++){
 
         // Rotate the temporary tensor
-        rotmat.mmult(tempR1, smTen[i]);
+        rotmat.mmult(tempR1, curlN[i]);
         tempR1.mTmult(SG, rotmat);
 
         // Get slip fraction graident

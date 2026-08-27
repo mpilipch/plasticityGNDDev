@@ -456,18 +456,15 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 						if(this->userInputs.gndOutputFlag){
 							temp.push_back(gndDensity[cellID][q]);
 
-							temp.push_back(gndDensityPSS[cellID][q][0]);
-							temp.push_back(gndDensityPSS[cellID][q][1]);
-							temp.push_back(gndDensityPSS[cellID][q][2]);
-							temp.push_back(gndDensityPSS[cellID][q][3]);
-							temp.push_back(gndDensityPSS[cellID][q][4]);
-							temp.push_back(gndDensityPSS[cellID][q][5]);
-							temp.push_back(gndDensityPSS[cellID][q][6]);
-							temp.push_back(gndDensityPSS[cellID][q][7]);
-							temp.push_back(gndDensityPSS[cellID][q][8]);
-							temp.push_back(gndDensityPSS[cellID][q][9]);
-							temp.push_back(gndDensityPSS[cellID][q][10]);
-							temp.push_back(gndDensityPSS[cellID][q][11]);
+							// 25 Lines. Will pad "extra" with 0
+							for (unsigned int lcvI = 0; lcvI < 24; ++lcvI) {
+								if (lcvI < gndDensityPSS[cellID][q].size()) {
+									temp.push_back(gndDensityPSS[cellID][q][lcvI]);
+
+								} else {
+									temp.push_back(0.0);
+								}
+							}
 						}
 
 /*						temp.push_back(slipfraction_conv[cellID][q][12]);

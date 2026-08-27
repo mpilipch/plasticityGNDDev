@@ -187,6 +187,10 @@ private:
   */ 
   std::vector<std::vector<double>> gndDensity;
   /** 
+  * Cross product result of the slip plane normals
+  */ 
+  std::vector<FullMatrix<double>> curlN;
+  /** 
   * GND Density Per
   */ 
   //Vector<double> gndDensityEl;
