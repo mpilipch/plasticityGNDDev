@@ -176,7 +176,10 @@ public:
 
   /* GND parameters*/
   bool gndOutputFlag; // Flag to indicate if GND output is required
-  std::vector<double> burgVecMags; // Burgers vector magnitudes in (m)
+  std::vector<double> burgVecMags1; // Burgers vector magnitudes in (mm) for phase 1 or default
+  std::vector<double> burgVecMags2; // Burgers vector magnitudes in (mm) for phase 2
+  std::vector<double> burgVecMags3; // Burgers vector magnitudes in (mm) for phase 3
+  std::vector<double> burgVecMags4; // Burgers vector magnitudes in (mm) for phase 4
   
   //Elastic Parameters
   std::vector<std::vector<double>> elasticStiffness1; // 	Elastic Stiffness Matrix -Voigt Notation (MPa)

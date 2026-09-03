@@ -81,7 +81,7 @@ private:
   void updateBeforeIncrement();
   void writeQuadratureOutput(std::string _outputDirectory, unsigned int _currentIncrement);
   void addToQuadratureOutput(std::vector<double>& _QuadOutputs);
-  void computeGND(unsigned int cellID, unsigned int quadPtID, FEValues<dim>&fe_values_temp, FullMatrix<double> &sModMat, const unsigned int &qptCt, const unsigned int &locDoft);
+  void computeGND(const unsigned int cellID, const unsigned int quadPtID, FEValues<dim>&fe_values_temp, FullMatrix<double> &sModMat, const unsigned int qptCt, const unsigned int locDoft);
   /**
   *calculates the rotation matrix (OrientationMatrix) from the rodrigues vector (r)
   */
@@ -187,11 +187,16 @@ private:
   */ 
   std::vector<std::vector<double>> gndDensity;
   /** 
-  * Cross product result of the slip plane normals
+  * Cross product with slip plane normals for GND
   */ 
-  std::vector<FullMatrix<double>> curlN;
+  std::vector<std::vector<FullMatrix<double>>> curlN;
   /** 
-  * GND Density Per
+  * Burgers vectors
+  */ 
+  std::vector<std::vector<double>> burgVecs;
+  /** 
+  /** 
+  * GND Density Per Element
   */ 
   //Vector<double> gndDensityEl;
   /**

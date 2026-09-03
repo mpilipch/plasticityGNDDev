@@ -2,9 +2,12 @@
 /* Based on the small deformation formulation*/
 
 template <int dim>
-void crystalPlasticity<dim>::computeGND(unsigned int cellID, unsigned int quadPtID, FEValues<dim>&fe_values_temp, FullMatrix<double> &sModMat, const unsigned int &qptCt, const unsigned int &locDoft)
+void crystalPlasticity<dim>::computeGND(const unsigned int cellID, const unsigned int quadPtID, FEValues<dim>&fe_values_temp, FullMatrix<double> &sModMat, const unsigned int qptCt, const unsigned int locDoft)
 {
+
     gndDensity[cellID][quadPtID] = 0.0;
+    unsigned int pID = this->phase[cellID][quadPtID]-1;
+    unsigned int nSlipSys = this->curlN[pID].size();
  
     // Rotation matrix of the crystal orientation
     FullMatrix<double> tempR1(dim,dim),SG(dim,dim);  // Temporary Matrices
@@ -16,10 +19,10 @@ void crystalPlasticity<dim>::computeGND(unsigned int cellID, unsigned int quadPt
     odfpoint(rotmat,rot1);
 
     // Find the GND denisties 
-    for(unsigned int i = 0; i < this->n_slip_systems; i++){
+    for(unsigned int i = 0; i < nSlipSys; i++){
 
         // Rotate the temporary tensor
-        rotmat.mmult(tempR1, curlN[i]);
+        rotmat.mmult(tempR1, curlN[pID][i]);
         tempR1.mTmult(SG, rotmat);
 
         // Get slip fraction graident
@@ -37,8 +40,6 @@ void crystalPlasticity<dim>::computeGND(unsigned int cellID, unsigned int quadPt
             grad_gamma += fe_values_temp.shape_grad(d,quadPtID) * slipNodal[d];
         }
         
-        
-
         Vector<double> curGNDVec(dim); 
         curGNDVec=0.0;
         for(unsigned int r = 0; r < dim; r++){
@@ -47,9 +48,8 @@ void crystalPlasticity<dim>::computeGND(unsigned int cellID, unsigned int quadPt
             }
         }
 
-        gndDensityPSS[cellID][quadPtID][i] = curGNDVec.l2_norm() / this->userInputs.burgVecMags[i];
+        gndDensityPSS[cellID][quadPtID][i] = curGNDVec.l2_norm() / burgVecs[pID][i];
         gndDensity[cellID][quadPtID] += gndDensityPSS[cellID][quadPtID][i];
-
     }
 
 }

@@ -247,7 +247,7 @@ void crystalPlasticity<dim>::init(unsigned int num_quad_points)
 
 
   Vector<double> s0_init (n_Tslip_systems_SinglePhase);
-  std::vector<double> twin_init(n_twin_systems_SinglePhase),slip_init(n_slip_systems_SinglePhase),gnd_init(n_slip_systems_SinglePhase);
+  std::vector<double> twin_init(n_twin_systems_SinglePhase),slip_init(n_slip_systems_SinglePhase);
   Vector<double> s0_init1,s0_init2,s0_init3,s0_init4;
   Vector<double> stateVar_init,stateVar_init1, stateVar_init2, stateVar_init3, stateVar_init4;
   std::vector<double> twin_init1,slip_init1;
@@ -266,9 +266,6 @@ void crystalPlasticity<dim>::init(unsigned int num_quad_points)
     slip_init[i]=0.0;
   }
 
-  for (unsigned int i=0;i<n_slip_systems_SinglePhase;i++){
-    gnd_init[i]=0.0;
-  }
 
   Vector<double> W_kh_init(n_Tslip_systems_SinglePhase);
   for (unsigned int i = 0;i<n_Tslip_systems_SinglePhase;i++) {
@@ -301,8 +298,6 @@ void crystalPlasticity<dim>::init(unsigned int num_quad_points)
     }
   }
 
-
-
   if (!this->userInputs.enableMultiphase){
     //Resize the vectors of history variables
     Fp_conv.resize(num_local_cells,std::vector<FullMatrix<double> >(num_quad_points,IdentityMatrix(dim)));
@@ -326,9 +321,41 @@ void crystalPlasticity<dim>::init(unsigned int num_quad_points)
     twin_ouput.resize(num_local_cells, std::vector<double>(num_quad_points,0.0));
     twin_conv.resize(num_local_cells,std::vector<unsigned int>(num_quad_points,0));
     twin_iter.resize(num_local_cells,std::vector<unsigned int>(num_quad_points,0));
-    gndDensityPSS.resize(num_local_cells,std::vector<std::vector<double>>(num_quad_points,gnd_init));
-    gndDensity.resize(num_local_cells,std::vector<double>(num_quad_points,0.0));
-//    gndDensityEl.reinit(num_local_cells,0.0);
+
+    if(this->userInputs.gndOutputFlag){
+      std::vector<double> gnd_init(n_slip_systems_SinglePhase, 0.0);
+      gndDensityPSS.resize(num_local_cells,std::vector<std::vector<double>>(num_quad_points,gnd_init));
+      gndDensity.resize(num_local_cells,std::vector<double>(num_quad_points,0.0));
+      //gndDensityEl.reinit(num_local_cells,0.0);
+
+      curlN.resize(1, std::vector<FullMatrix<double>>(n_slip_systems_SinglePhase, FullMatrix<double>(dim,dim)));
+      for(unsigned int i = 0; i < n_slip_systems_SinglePhase; i++){
+
+          curlN[0][i] = 0.0;
+
+          if(dim == 3){
+            curlN[0][i](0,1) = n_alpha_SinglePhase[i][2];
+            curlN[0][i](0,2) = n_alpha_SinglePhase[i][1] * -1;
+            
+            curlN[0][i](1,0) = n_alpha_SinglePhase[i][2] * -1;
+            curlN[0][i](1,2) = n_alpha_SinglePhase[i][0];
+
+            curlN[0][i](2,0) = n_alpha_SinglePhase[i][1];
+            curlN[0][i](2,1) = n_alpha_SinglePhase[i][0] * -1;
+          }
+      }
+
+      burgVecs.resize(1, std::vector<double>(n_slip_systems_SinglePhase, 0.0));
+
+        if(burgVecs[0].size() != this->userInputs.burgVecMags1.size()){
+          std::cerr << "Error: Disagreement in number of slip systems and Burgers vector magnitudes." << std::endl;
+          exit(1);
+        }
+
+      for(unsigned int i = 0; i < n_slip_systems_SinglePhase; i++){
+        burgVecs[0][i] = this->userInputs.burgVecMags1[i];
+      }
+    }
 
     if (this->userInputs.enableUserMaterialModel){
       stateVar_conv.resize(num_local_cells,std::vector<Vector<double> >(num_quad_points,stateVar_init));
@@ -910,17 +937,8 @@ void crystalPlasticity<dim>::init(unsigned int num_quad_points)
             m_alpha_MultiPhase[id][1]=1;
             m_alpha_MultiPhase[id][2]=0;
           }
-
-
-
         }
-
-
-
       }
-
-
-
     }
 
     Dmat_MultiPhase.reinit(6*this->userInputs.numberofPhases,6*this->userInputs.numberofPhases); Dmat=0.0;
@@ -967,7 +985,6 @@ void crystalPlasticity<dim>::init(unsigned int num_quad_points)
     twin_init1.resize(Max_n_twin_systems_MultiPhase);
     slip_init1.resize(Max_n_slip_systems_MultiPhase);
 
-
     for (unsigned int i=0;i<Max_n_Tslip_systems_MultiPhase;i++){
       s0_init1(i)=0;
     }
@@ -996,9 +1013,6 @@ void crystalPlasticity<dim>::init(unsigned int num_quad_points)
         stateVar_init1(i)=stateVar_init(i);
       }
     }
-
-
-
 
     Fp_conv.resize(num_local_cells,std::vector<FullMatrix<double> >(num_quad_points,IdentityMatrix(dim)));
     Fe_conv.resize(num_local_cells,std::vector<FullMatrix<double> >(num_quad_points,IdentityMatrix(dim)));
@@ -1172,30 +1186,70 @@ void crystalPlasticity<dim>::init(unsigned int num_quad_points)
     }
 
 
+    
+    if(this->userInputs.gndOutputFlag){
+
+      std::vector<double> gnd_init(Max_n_slip_systems_MultiPhase,0.0);
+      gndDensityPSS.resize(num_local_cells,std::vector<std::vector<double>>(num_quad_points,gnd_init));
+      gndDensity.resize(num_local_cells,std::vector<double>(num_quad_points,0.0));
+      //gndDensityEl.reinit(num_local_cells,0.0);
+
+      curlN.resize(this->userInputs.numberofPhases);
+      burgVecs.resize(this->userInputs.numberofPhases);
+      for(unsigned int i = 0; i<this->userInputs.numberofPhases; ++i){
+        curlN[i].resize(n_slip_systems_MultiPhase[i], FullMatrix<double>(dim, dim));
+        burgVecs[i].resize(n_slip_systems_MultiPhase[i], 0.0);
+      }
+
+      unsigned int phaseStart = 0;
+      for (unsigned int p = 0; p < this->userInputs.numberofPhases; ++p){
+        for (unsigned int i = 0; i < n_slip_systems_MultiPhase[p]; ++i){
+          const unsigned int idx = phaseStart + i;
+          curlN[p][i] = 0.0;
+
+          if (dim == 3)
+          {
+            curlN[p][i](0,1) = n_alpha_MultiPhase[idx][2];
+            curlN[p][i](0,2) = -n_alpha_MultiPhase[idx][1];
+            curlN[p][i](1,0) = -n_alpha_MultiPhase[idx][2];
+            curlN[p][i](1,2) = n_alpha_MultiPhase[idx][0];
+            curlN[p][i](2,0) = n_alpha_MultiPhase[idx][1];
+            curlN[p][i](2,1) = -n_alpha_MultiPhase[idx][0];
+          }
+        }
+        phaseStart += n_Tslip_systems_MultiPhase[p];
+
+        std::vector <double> phaseBurgVecs;
+
+        if(p==0){
+          phaseBurgVecs = this->userInputs.burgVecMags1;
+        }
+        else if(p==1){
+          phaseBurgVecs = this->userInputs.burgVecMags2;
+        }
+        else if(p==2){
+          phaseBurgVecs = this->userInputs.burgVecMags3;
+        }
+        else if(p==3){
+          phaseBurgVecs = this->userInputs.burgVecMags4;
+        }
+
+        if(burgVecs[p].size() != phaseBurgVecs.size()){
+          std::cerr << "Error: Disagreement in number of slip systems and Burgers vector magnitudes for phase " << p << "." << std::endl;
+          exit(1);
+        }
+
+
+        for (unsigned int i = 0; i < n_slip_systems_MultiPhase[p]; ++i){
+          burgVecs[p][i] = phaseBurgVecs[i];
+        }
+      }
+    }
   }
 
   N_qpts=num_quad_points;
   initCalled=true;
 
-  curlN.resize(n_slip_systems_SinglePhase, FullMatrix<double>(dim,dim));
-  for(unsigned int i = 0; i < n_slip_systems_SinglePhase; i++){
-
-      curlN[i] = 0.0;
-
-      if(dim == 3){
-      curlN[i](0,1) = n_alpha_SinglePhase[i][2];
-      curlN[i](0,2) = n_alpha_SinglePhase[i][1] * -1;
-      
-      curlN[i](1,0) = n_alpha_SinglePhase[i][2] * -1;
-      curlN[i](1,2) = n_alpha_SinglePhase[i][0];
-
-      curlN[i](2,0) = n_alpha_SinglePhase[i][1];
-      curlN[i](2,1) = n_alpha_SinglePhase[i][0] * -1;
-      }
-      else if(dim == 2){
-      curlN[i](0,1) = n_alpha_SinglePhase[i][1] * -1;
-      curlN[i](1,0) = n_alpha_SinglePhase[i][0];}
-  }
 
 }
 

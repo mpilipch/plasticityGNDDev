@@ -54,6 +54,7 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 	typename DoFHandler<dim>::active_cell_iterator cell = this->dofHandler.begin_active(), endc = this->dofHandler.end();
 	for (; cell != endc; ++cell) {
 		if (cell->is_locally_owned()) {
+			
 			fe_values.reinit(cell);
 			//loop over quadrature points
 			cell->set_user_index(fe_values.get_cell()->user_index());
