@@ -326,7 +326,8 @@ void crystalPlasticity<dim>::init(unsigned int num_quad_points)
       std::vector<double> gnd_init(n_slip_systems_SinglePhase, 0.0);
       gndDensityPSS.resize(num_local_cells,std::vector<std::vector<double>>(num_quad_points,gnd_init));
       gndDensity.resize(num_local_cells,std::vector<double>(num_quad_points,0.0));
-      //gndDensityEl.reinit(num_local_cells,0.0);
+      gndDensityEl.reinit(num_local_cells,0.0);
+      volEl.reinit(num_local_cells,0.0);
 
       curlN.resize(1, std::vector<FullMatrix<double>>(n_slip_systems_SinglePhase, FullMatrix<double>(dim,dim)));
       for(unsigned int i = 0; i < n_slip_systems_SinglePhase; i++){
@@ -353,6 +354,11 @@ void crystalPlasticity<dim>::init(unsigned int num_quad_points)
         }
 
       for(unsigned int i = 0; i < n_slip_systems_SinglePhase; i++){
+          
+          if(this->userInputs.burgVecMags1[i] == 0){
+            std::cerr << "Error: zero burgers vector magnitude found" << std::endl;
+            exit(1);
+          }
         burgVecs[0][i] = this->userInputs.burgVecMags1[i];
       }
     }
@@ -1192,7 +1198,8 @@ void crystalPlasticity<dim>::init(unsigned int num_quad_points)
       std::vector<double> gnd_init(Max_n_slip_systems_MultiPhase,0.0);
       gndDensityPSS.resize(num_local_cells,std::vector<std::vector<double>>(num_quad_points,gnd_init));
       gndDensity.resize(num_local_cells,std::vector<double>(num_quad_points,0.0));
-      //gndDensityEl.reinit(num_local_cells,0.0);
+      gndDensityEl.reinit(num_local_cells,0.0);
+      volEl.reinit(num_local_cells,0.0);
 
       curlN.resize(this->userInputs.numberofPhases);
       burgVecs.resize(this->userInputs.numberofPhases);
@@ -1241,6 +1248,11 @@ void crystalPlasticity<dim>::init(unsigned int num_quad_points)
 
 
         for (unsigned int i = 0; i < n_slip_systems_MultiPhase[p]; ++i){
+          
+          if(phaseBurgVecs[i] == 0){
+            std::cerr << "Error: zero burgers vector magnitude found" << std::endl;
+            exit(1);
+          }
           burgVecs[p][i] = phaseBurgVecs[i];
         }
       }

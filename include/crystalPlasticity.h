@@ -198,7 +198,7 @@ private:
   /** 
   * GND Density Per Element
   */ 
-  //Vector<double> gndDensityEl;
+  Vector<double> gndDensityEl, volEl;
   /**
   * Tangent modulus dPK1/dF
   */

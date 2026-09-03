@@ -45,9 +45,8 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 	QGauss<dim>  lhs_quad(degree + 2);
 	FETools::compute_projection_from_quadrature_points_matrix(fe_temp, lhs_quad, quadrature, sModMat);
 	FEValues<dim> fe_values_temp(fe_temp, quadrature, update_gradients | update_quadrature_points);
-
-//	std::cout << "About to reach reset"<< std::endl;
-//	gndDensityEl = 0.0;
+	gndDensityEl = 0.0;
+	volEl = 0.0;
 
 	//loop over elements
 	unsigned int cellID = 0;
@@ -59,6 +58,17 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 			//loop over quadrature points
 			cell->set_user_index(fe_values.get_cell()->user_index());
 			cell->get_dof_indices(local_dof_indices);
+			fe_values_temp.reinit(cell);
+			if(this->userInputs.gndOutputFlag){ // Just in case - checking the 1 phase per element for GND computation gradients
+				unsigned int refPhase = this->phase[cellID][0];
+				for(unsigned int qd = 1; qd < num_quad_points; qd++){
+					if(this->phase[cellID][qd] != refPhase){
+						std::cout << "Error: GND computation requires uniform phase per element. "
+								<< "Mixed phases detected at cellID=" << cellID << "." << std::endl;
+						exit(1);
+					}
+				}
+			}
 
 			//////////Buffer layer feature/////////////
 			if (this->userInputs.flagBufferLayer){
@@ -260,13 +270,17 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 
 				
 				if (this->userInputs.gndOutputFlag){
-					//std::cout << "Solving for GND at Increment " << this->currentIncrement << "For slip system " << i << std::endl;
-					fe_values_temp.reinit(cell);
+					
 					computeGND(cellID, q, fe_values_temp, sModMat, num_quad_points, projDof);
+
+					gndDensityEl[cellID] += gndDensity[cellID][q]*fe_values.JxW(q);
+					volEl[cellID] += fe_values.JxW(q);
 				}
 			}
-			//Already set to zero earlier, so even if not using it, shouldn't cause issue
-//			gndDensityEl[cellID] /= cell->measure();
+			if (this->userInputs.gndOutputFlag){
+				gndDensityEl[cellID] /= volEl[cellID];
+			}
+
 
 			if (this->userInputs.writeOutput){
 			//Calculation of work density for the cell
@@ -275,7 +289,7 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 //////////////////////////////////////////////////////////////////////////
 				this->postprocessValuesAtCellCenters(cellID,0)=cellOrientationMap[cellID];
 ////////User Defined Variables for visualization outputs for cell_centers (outputoutputCellCenters_Var1 to outputoutputCellCenters_Var24)////////
-				this->postprocessValuesAtCellCenters(cellID,1)=0;   //This outputs 
+				this->postprocessValuesAtCellCenters(cellID,1)=gndDensityEl[cellID];   //This outputs 
 				this->postprocessValuesAtCellCenters(cellID,2)=0;
 				this->postprocessValuesAtCellCenters(cellID,3)=0;
 				this->postprocessValuesAtCellCenters(cellID,4)=0;

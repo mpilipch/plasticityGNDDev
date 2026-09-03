@@ -13,7 +13,7 @@ void crystalPlasticity<dim>::computeGND(const unsigned int cellID, const unsigne
     FullMatrix<double> tempR1(dim,dim),SG(dim,dim);  // Temporary Matrices
     tempR1=0.0; SG=0.0;
     Vector<double> rot1(dim);// Crystal orientation (Rodrigues representation)
-    rot1=rot_conv[cellID][quadPtID];
+    rot1=rotnew_iter[cellID][quadPtID];
     FullMatrix<double> rotmat(dim,dim);
     rotmat=0.0;
     odfpoint(rotmat,rot1);
