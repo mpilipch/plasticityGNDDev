@@ -268,16 +268,14 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 
 				F_lastIter_Global[cellID][q]=F;
 
-				
-				if (this->userInputs.gndOutputFlag){
-					
+			}
+			if (this->userInputs.gndOutputFlag){
+				for (unsigned int q = 0; q < num_quad_points; ++q) {
 					computeGND(cellID, q, fe_values_temp, sModMat, num_quad_points, projDof);
 
 					gndDensityEl[cellID] += gndDensity[cellID][q]*fe_values.JxW(q);
 					volEl[cellID] += fe_values.JxW(q);
 				}
-			}
-			if (this->userInputs.gndOutputFlag){
 				gndDensityEl[cellID] /= volEl[cellID];
 			}
 
@@ -289,7 +287,7 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 //////////////////////////////////////////////////////////////////////////
 				this->postprocessValuesAtCellCenters(cellID,0)=cellOrientationMap[cellID];
 ////////User Defined Variables for visualization outputs for cell_centers (outputoutputCellCenters_Var1 to outputoutputCellCenters_Var24)////////
-				this->postprocessValuesAtCellCenters(cellID,1)=gndDensityEl[cellID];   //This outputs 
+				this->postprocessValuesAtCellCenters(cellID,1)=0; //gndDensityEl[cellID];    
 				this->postprocessValuesAtCellCenters(cellID,2)=0;
 				this->postprocessValuesAtCellCenters(cellID,3)=0;
 				this->postprocessValuesAtCellCenters(cellID,4)=0;
@@ -467,20 +465,6 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 						temp.push_back(slipfraction_conv[cellID][q][9]);
 						temp.push_back(slipfraction_conv[cellID][q][10]);
 						temp.push_back(slipfraction_conv[cellID][q][11]);
-			
-						if(this->userInputs.gndOutputFlag){
-							temp.push_back(gndDensity[cellID][q]);
-
-							// 25 Lines. Will pad "extra" with 0
-							for (unsigned int lcvI = 0; lcvI < 24; ++lcvI) {
-								if (lcvI < gndDensityPSS[cellID][q].size()) {
-									temp.push_back(gndDensityPSS[cellID][q][lcvI]);
-
-								} else {
-									temp.push_back(0.0);
-								}
-							}
-						}
 
 /*						temp.push_back(slipfraction_conv[cellID][q][12]);
 						temp.push_back(slipfraction_conv[cellID][q][13]);
@@ -644,6 +628,20 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 							temp.push_back(stateVar_conv[cellID][q][50]);
 						}
 */
+			
+						if(this->userInputs.gndOutputFlag){
+							temp.push_back(gndDensity[cellID][q]);
+
+							// 25 Lines. Will pad "extra" with 0
+							for (unsigned int lcvI = 0; lcvI < 24; ++lcvI) {
+								if (lcvI < gndDensityPSS[cellID][q].size()) {
+									temp.push_back(gndDensityPSS[cellID][q][lcvI]);
+
+								} else {
+									temp.push_back(0.0);
+								}
+							}
+						}
 						addToQuadratureOutput(temp);
 
 					}

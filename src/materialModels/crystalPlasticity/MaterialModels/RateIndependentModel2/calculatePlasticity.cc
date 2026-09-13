@@ -122,9 +122,10 @@ void crystalPlasticity<dim>::calculatePlasticity(unsigned int cellID,
     Vector<double> active;
     Vector<double> PA, PA_temp(1);
     Vector<double> resolved_shear_tau_trial(n_Tslip_systems),b(n_Tslip_systems),resolved_shear_tau(n_Tslip_systems);
-    Vector<double> x_beta_old(n_Tslip_systems);
-
+    
     Vector<double> x_beta(n_Tslip_systems);
+    Vector<double> x_beta_old(n_Tslip_systems);
+    Vector<double> x_beta_old_stored(n_Tslip_systems);
 
     FullMatrix<double> PK1_Stiff(dim*dim,dim*dim);
 
@@ -149,6 +150,7 @@ void crystalPlasticity<dim>::calculatePlasticity(unsigned int cellID,
 
     unsigned int iter1=1;
     unsigned int flag2=0;
+    x_beta_old_stored = 0.0;
 
     while (iter1) {
 
@@ -447,13 +449,7 @@ void crystalPlasticity<dim>::calculatePlasticity(unsigned int cellID,
 
       }
 
-      for (unsigned int i=0;i<n_twin_systems;i++){
-        twinfraction_iter[cellID][quadPtID][i]=twinfraction_conv[cellID][quadPtID][i]+x_beta_old[i+n_slip_systems]/twinShear;
-      }
-
-      for (unsigned int i=0;i<n_slip_systems;i++){
-        slipfraction_iter[cellID][quadPtID][i]=slipfraction_conv[cellID][quadPtID][i]+x_beta_old[i];
-      }
+      x_beta_old_stored += x_beta_old;
 
       Fpn_inv = 0.0; Fpn_inv.invert(FP_tau);
       FE_tau = 0.0;
@@ -829,6 +825,14 @@ void crystalPlasticity<dim>::calculatePlasticity(unsigned int cellID,
 
       iter1=iter1+1;
 
+    }
+
+    for (unsigned int i=0;i<n_twin_systems;i++){
+      twinfraction_iter[cellID][quadPtID][i]=twinfraction_conv[cellID][quadPtID][i]+x_beta_old_stored[i+n_slip_systems]/twinShear;
+    }
+
+    for (unsigned int i=0;i<n_slip_systems;i++){
+      slipfraction_iter[cellID][quadPtID][i]=slipfraction_conv[cellID][quadPtID][i]+x_beta_old_stored[i];
     }
 
 

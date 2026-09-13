@@ -369,7 +369,11 @@ void crystalPlasticity<dim>::init2(unsigned int num_quad_points)
 
   N_qpts=num_quad_points;
   initCalled=true;
-
+   
+  if(this->userInputs.gndOutputFlag){
+    std::cout << "GND output is not compatible with the Advanced Twinning Model yet." << std::endl;
+    exit(1);
+  }
 
 }
 
