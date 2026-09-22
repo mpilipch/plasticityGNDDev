@@ -211,7 +211,7 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 					this->postprocessValues(cellID, q, 2, 0) = twin_ouput[cellID][q];
 
 					////////User Defined Variables for visualization outputs (output_Var1 to output_Var24)////////
-					this->postprocessValues(cellID, q, 3, 0) = 0;
+					this->postprocessValues(cellID, q, 3, 0) = gndDensity[cellID][q];;
 					this->postprocessValues(cellID, q, 4, 0) = 0;
 					this->postprocessValues(cellID, q, 5, 0) = 0;
 					this->postprocessValues(cellID, q, 6, 0) = 0;

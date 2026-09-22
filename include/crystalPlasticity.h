@@ -126,11 +126,11 @@ private:
   *calculates the matrix exponential of 3x3 matrix A
   */
   FullMatrix<double> matrixExponential6(FullMatrix<double> A);
-        /**
+  /**
   *calculates the matrix exponential of 3x3 matrix A
   */
   FullMatrix<double> matrixExponentialGateauxDerivative(FullMatrix<double> A, FullMatrix<double> B);
-        /**
+  /**
    *calculates the matrix exponential of 3x3 matrix A
    */
   FullMatrix<double> matrixExponentialGateauxDerivative2(FullMatrix<double> A, FullMatrix<double> B);
@@ -187,14 +187,13 @@ private:
   */ 
   std::vector<std::vector<double>> gndDensity;
   /** 
-  * Cross product with slip plane normals for GND
+  * Skew symmetric matrix of slip plane normals for curl operation for GND
   */ 
   std::vector<std::vector<FullMatrix<double>>> curlN;
   /** 
   * Burgers vectors
   */ 
   std::vector<std::vector<double>> burgVecs;
-  /** 
   /** 
   * GND Density Per Element
   */ 
