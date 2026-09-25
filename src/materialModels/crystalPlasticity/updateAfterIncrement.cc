@@ -15,7 +15,6 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 	Vector<double> userDefinedAverageOutput,local_userDefinedAverageOutput;
 	FullMatrix<double> P_LastIter(dim,dim);
 	FullMatrix<double> F_lastIter(dim,dim),deltaF(dim,dim);
-	FullMatrix<double> sModMat;
 
 	if (this->userInputs.flagUserDefinedAverageOutput){
 		userDefinedAverageOutput.reinit(this->userInputs.numberUserDefinedAverageOutput);
@@ -39,14 +38,19 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 			}
 		}
 	}
+	
+	// GND Block
+	FullMatrix<double> sModMat;
 	const unsigned int degree = fe_values.get_fe().tensor_degree();
 	FE_Q<dim> fe_temp(degree);
 	const unsigned int projDof = fe_temp.dofs_per_cell;
 	QGauss<dim>  lhs_quad(degree + 2);
 	FETools::compute_projection_from_quadrature_points_matrix(fe_temp, lhs_quad, quadrature, sModMat);
 	FEValues<dim> fe_values_temp(fe_temp, quadrature, update_gradients | update_quadrature_points);
-	gndDensityEl = 0.0;
-	volEl = 0.0;
+	if(this->userInputs.gndOutputFlag){
+		gndDensityEl = 0.0;
+		volEl = 0.0;
+	}
 
 	//loop over elements
 	unsigned int cellID = 0;
@@ -58,10 +62,12 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 			//loop over quadrature points
 			cell->set_user_index(fe_values.get_cell()->user_index());
 			cell->get_dof_indices(local_dof_indices);
-			fe_values_temp.reinit(cell);
-			if(this->userInputs.gndOutputFlag){ // Just in case - checking the 1 phase per element for GND computation gradients
+			
+			if(this->userInputs.gndOutputFlag){
+				fe_values_temp.reinit(cell);
+
 				unsigned int refPhase = this->phase[cellID][0];
-				for(unsigned int qd = 1; qd < num_quad_points; qd++){
+				for(unsigned int qd = 1; qd < num_quad_points; qd++){  // Just in case - checking the 1 phase per element for GND computation gradients
 					if(this->phase[cellID][qd] != refPhase){
 						std::cout << "Error: GND computation requires uniform phase per element. "
 								<< "Mixed phases detected at cellID=" << cellID << "." << std::endl;
@@ -211,7 +217,7 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 					this->postprocessValues(cellID, q, 2, 0) = twin_ouput[cellID][q];
 
 					////////User Defined Variables for visualization outputs (output_Var1 to output_Var24)////////
-					this->postprocessValues(cellID, q, 3, 0) = gndDensity[cellID][q];;
+					this->postprocessValues(cellID, q, 3, 0) = 0; //gndDensity[cellID][q];
 					this->postprocessValues(cellID, q, 4, 0) = 0;
 					this->postprocessValues(cellID, q, 5, 0) = 0;
 					this->postprocessValues(cellID, q, 6, 0) = 0;
@@ -275,6 +281,10 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 
 					gndDensityEl[cellID] += gndDensity[cellID][q]*fe_values.JxW(q);
 					volEl[cellID] += fe_values.JxW(q);
+
+					if (this->userInputs.writeOutput || false){
+						this->postprocessValues(cellID, q, 3, 0) = gndDensity[cellID][q];
+					}
 				}
 				gndDensityEl[cellID] /= volEl[cellID];
 			}
