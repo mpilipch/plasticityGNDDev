@@ -217,7 +217,7 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 					this->postprocessValues(cellID, q, 2, 0) = twin_ouput[cellID][q];
 
 					////////User Defined Variables for visualization outputs (output_Var1 to output_Var24)////////
-					this->postprocessValues(cellID, q, 3, 0) = 0; //gndDensity[cellID][q];
+					this->postprocessValues(cellID, q, 3, 0) = 0;
 					this->postprocessValues(cellID, q, 4, 0) = 0;
 					this->postprocessValues(cellID, q, 5, 0) = 0;
 					this->postprocessValues(cellID, q, 6, 0) = 0;
@@ -281,10 +281,6 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 
 					gndDensityEl[cellID] += gndDensity[cellID][q]*fe_values.JxW(q);
 					volEl[cellID] += fe_values.JxW(q);
-
-					if (this->userInputs.writeOutput || false){
-						this->postprocessValues(cellID, q, 3, 0) = gndDensity[cellID][q];
-					}
 				}
 				gndDensityEl[cellID] /= volEl[cellID];
 			}
@@ -394,7 +390,7 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 					for (unsigned int q=0; q<num_quad_points; ++q){
 						std::vector<double> temp;
 						temp.push_back(cellOrientationMap[cellID]);
-/*
+
 						if (!this->userInputs.enableAdvancedTwinModel){
 							temp.push_back(phase[cellID][q]);
 						}
@@ -402,11 +398,11 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 						temp.push_back(fe_values.JxW(q));
 
 						temp.push_back(twin_ouput[cellID][q]);
-*/
+
 						temp.push_back(fe_values.get_quadrature_points()[q][0]);
 						temp.push_back(fe_values.get_quadrature_points()[q][1]);
 						temp.push_back(fe_values.get_quadrature_points()[q][2]);
-/*
+
 						temp.push_back(rotnew_conv[cellID][q][0]);
 						temp.push_back(rotnew_conv[cellID][q][1]);
 						temp.push_back(rotnew_conv[cellID][q][2]);
@@ -420,7 +416,7 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 						temp.push_back(Fe_conv[cellID][q][1][2]);
 						temp.push_back(Fe_conv[cellID][q][2][0]);
 						temp.push_back(Fe_conv[cellID][q][2][1]);
-*/
+
 						temp.push_back(Fp_conv[cellID][q][0][0]);
 						temp.push_back(Fp_conv[cellID][q][1][1]);
 						temp.push_back(Fp_conv[cellID][q][2][2]);
@@ -430,7 +426,7 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 						temp.push_back(Fp_conv[cellID][q][1][2]);
 						temp.push_back(Fp_conv[cellID][q][2][0]);
 						temp.push_back(Fp_conv[cellID][q][2][1]);
-/*
+
 						temp.push_back(CauchyStress[cellID][q][0][0]);
 						temp.push_back(CauchyStress[cellID][q][1][1]);
 						temp.push_back(CauchyStress[cellID][q][2][2]);
@@ -462,7 +458,7 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 							temp.push_back(TinterStress_diff[cellID][q][2][0]);
 							temp.push_back(TinterStress_diff[cellID][q][2][1]);
 						}
-*/
+
 						temp.push_back(slipfraction_conv[cellID][q][0]);
 						temp.push_back(slipfraction_conv[cellID][q][1]);
 						temp.push_back(slipfraction_conv[cellID][q][2]);
@@ -475,8 +471,7 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 						temp.push_back(slipfraction_conv[cellID][q][9]);
 						temp.push_back(slipfraction_conv[cellID][q][10]);
 						temp.push_back(slipfraction_conv[cellID][q][11]);
-
-/*						temp.push_back(slipfraction_conv[cellID][q][12]);
+						temp.push_back(slipfraction_conv[cellID][q][12]);
 						temp.push_back(slipfraction_conv[cellID][q][13]);
 						temp.push_back(slipfraction_conv[cellID][q][14]);
 						temp.push_back(slipfraction_conv[cellID][q][15]);
@@ -637,7 +632,6 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 							temp.push_back(stateVar_conv[cellID][q][49]);
 							temp.push_back(stateVar_conv[cellID][q][50]);
 						}
-*/
 			
 						if(this->userInputs.gndOutputFlag){
 							temp.push_back(gndDensity[cellID][q]);
