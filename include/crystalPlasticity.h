@@ -256,6 +256,7 @@ private:
   std::vector<std::vector<  Vector<double> > >  stateVar_conv,stateVar_iter;
   Vector<double> UserMatConstants;
   std::vector<std::vector<  std::vector<double> > >  twinfraction_iter, slipfraction_iter,twinfraction_conv, slipfraction_conv,TwinOutputfraction_iter,TwinOutputfraction_conv;
+  std::vector<std::vector<  std::vector<double> > >  slipSigned_iter, slipSigned_conv;
   std::vector<std::vector<std::vector<unsigned int> > >	TwinFlag_conv, ActiveTwinSystems_conv, TwinFlag_iter, ActiveTwinSystems_iter;
   std::vector<std::vector<unsigned int> > NumberOfTwinnedRegion_conv, TwinMaxFlag_iter, TwinMaxFlag_conv, NumberOfTwinnedRegion_iter;
   std::vector<std::vector<double> >  twin_ouput, TotaltwinvfK;

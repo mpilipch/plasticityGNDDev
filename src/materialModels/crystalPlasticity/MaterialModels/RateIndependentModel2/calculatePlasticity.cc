@@ -126,6 +126,8 @@ void crystalPlasticity<dim>::calculatePlasticity(unsigned int cellID,
     Vector<double> x_beta(n_Tslip_systems);
     Vector<double> x_beta_old(n_Tslip_systems);
     Vector<double> x_beta_old_stored(n_Tslip_systems);
+    Vector<double> x_beta_signed_stored(n_slip_systems);
+    Vector<double> sgn_pass(n_slip_systems);
 
     FullMatrix<double> PK1_Stiff(dim*dim,dim*dim);
 
@@ -151,6 +153,7 @@ void crystalPlasticity<dim>::calculatePlasticity(unsigned int cellID,
     unsigned int iter1=1;
     unsigned int flag2=0;
     x_beta_old_stored = 0.0;
+    x_beta_signed_stored = 0.0;
 
     while (iter1) {
 
@@ -311,6 +314,7 @@ void crystalPlasticity<dim>::calculatePlasticity(unsigned int cellID,
 
 
       x_beta_old=0.0;
+      sgn_pass=0.0;
 
       unsigned int count1=0;
 
@@ -346,13 +350,17 @@ void crystalPlasticity<dim>::calculatePlasticity(unsigned int cellID,
             }
           }
 
-
+          if(i<n_slip_systems){
+            sgn_pass(i) = ((resolved_shear_tau_trial(i) - W_kh_tau(i))>0) ? 1.0 : -1.0;
+          }
           for (unsigned int j=0;j<dim;j++){
             for (unsigned int k=0;k<dim;k++){
               if((resolved_shear_tau_trial(i) - W_kh_tau(i))>0)
               del_FP[j][k]=del_FP[j][k]+x_beta_old(i)*temp[j][k];
               else
               del_FP[j][k]=del_FP[j][k]-x_beta_old(i)*temp[j][k];
+
+
             }
           }
 
@@ -450,6 +458,9 @@ void crystalPlasticity<dim>::calculatePlasticity(unsigned int cellID,
       }
 
       x_beta_old_stored += x_beta_old;
+      for (unsigned int i=0;i<n_slip_systems;i++){
+        x_beta_signed_stored(i) += sgn_pass(i)*x_beta_old(i);
+      }
 
       Fpn_inv = 0.0; Fpn_inv.invert(FP_tau);
       FE_tau = 0.0;
@@ -833,6 +844,7 @@ void crystalPlasticity<dim>::calculatePlasticity(unsigned int cellID,
 
     for (unsigned int i=0;i<n_slip_systems;i++){
       slipfraction_iter[cellID][quadPtID][i]=slipfraction_conv[cellID][quadPtID][i]+x_beta_old_stored[i];
+      slipSigned_iter[cellID][quadPtID][i]=slipSigned_conv[cellID][quadPtID][i]+x_beta_signed_stored[i];
     }
 
 

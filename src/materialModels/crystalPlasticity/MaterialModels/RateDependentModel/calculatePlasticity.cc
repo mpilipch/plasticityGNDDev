@@ -50,6 +50,7 @@ void crystalPlasticity<dim>::calculatePlasticity(unsigned int cellID,
     FullMatrix<double> Dmat(2*dim,2*dim),Dmat2(2*dim,2*dim),TM(dim*dim,dim*dim);
     Vector<double> vec2(dim*dim);
     Vector<double> s_alpha_tau(n_Tslip_systems),slipfraction_tau(n_slip_systems),twinfraction_tau(n_twin_systems) ;
+    Vector<double> slipSigned_t(n_slip_systems), slipSigned_tau(n_slip_systems);
     Vector<double> W_kh_tau(n_Tslip_systems),W_kh_tau1(n_Tslip_systems),W_kh_tau2(n_Tslip_systems); // Converged backstresses
     Vector<double> W_kh_tau_it(n_Tslip_systems),W_kh_tau1_it(n_Tslip_systems),W_kh_tau2_it(n_Tslip_systems); // Iterative backstresses
     Vector<double> h_beta(n_Tslip_systems),h0(n_Tslip_systems),a_pow(n_Tslip_systems),s_s(n_Tslip_systems); // Isotropic hardening parameters
@@ -160,8 +161,10 @@ void crystalPlasticity<dim>::calculatePlasticity(unsigned int cellID,
 
     Ep_eff_cum_t=stateVar_conv[cellID][quadPtID][4*n_Tslip_systems+dim*dim];
 
-    for(unsigned int i=0 ; i<n_slip_systems ; i++)
-    slipfraction_t(i) = slipfraction_conv[cellID][quadPtID][i] ;
+    for(unsigned int i=0 ; i<n_slip_systems ; i++){
+      slipfraction_t(i) = slipfraction_conv[cellID][quadPtID][i] ;
+      slipSigned_t(i) = slipSigned_conv[cellID][quadPtID][i];
+    }
 
     for(unsigned int i=0 ; i<n_twin_systems ; i++)
     twinfraction_t(i) = twinfraction_conv[cellID][quadPtID][i] ;
@@ -240,6 +243,7 @@ void crystalPlasticity<dim>::calculatePlasticity(unsigned int cellID,
 
     slipfraction_tau = slipfraction_t ;
     signed_slip_tau  = signed_slip_t;
+    slipSigned_tau = slipSigned_t;
     Ep_tau=Ep_t;
     Ep_eff_cum_tau=Ep_eff_cum_t;
     twinfraction_tau = twinfraction_t ;
@@ -763,9 +767,12 @@ void crystalPlasticity<dim>::calculatePlasticity(unsigned int cellID,
       LP_acc.add(delgam_tau(i),temp);
     }
 
-    for(unsigned int i=0 ; i<n_slip_systems ; i++)
+    for(unsigned int i=0 ; i<n_slip_systems ; i++){
     slipfraction_tau(i) = slipfraction_t(i) + fabs(delgam_tau(i)) ;
+    slipSigned_tau(i) = slipSigned_t(i) + delgam_tau(i) ;
+  }
     slipfraction_t=slipfraction_tau;
+    slipSigned_t=slipSigned_tau;
 
     for(unsigned int i=0 ; i<n_Tslip_systems ; i++)
     signed_slip_tau(i) = signed_slip_t(i) + delgam_tau(i) ;
@@ -1163,8 +1170,9 @@ void crystalPlasticity<dim>::calculatePlasticity(unsigned int cellID,
     for(unsigned int i=0 ; i<n_twin_systems ; i++)
     twinfraction_iter[cellID][quadPtID][i]=twinfraction_tau(i);
 
-    for(unsigned int i=0 ; i<n_slip_systems ; i++)
+    for(unsigned int i=0 ; i<n_slip_systems ; i++){
     slipfraction_iter[cellID][quadPtID][i]=slipfraction_tau(i);
+    slipSigned_iter[cellID][quadPtID][i]=slipSigned_tau(i);}
 
     if (this->userInputs.flagTaylorModel){
       F=F_tau; // Updating Deformation Gradient if it is Taylor model

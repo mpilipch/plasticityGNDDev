@@ -28,7 +28,8 @@ void crystalPlasticity<dim>::computeGND(const unsigned int cellID, const unsigne
         // Get slip fraction graident
         Vector<double> slipQpts(qptCt), slipNodal(locDoft);
         for(unsigned int qd = 0; qd < qptCt; qd++){
-            slipQpts[qd] = this->slipfraction_iter[cellID][qd][i];
+            //slipQpts[qd] = this->slipfraction_iter[cellID][qd][i];
+            slipQpts[qd] = this->slipSigned_iter[cellID][qd][i];
         }
         sModMat.vmult(slipNodal, slipQpts);
 

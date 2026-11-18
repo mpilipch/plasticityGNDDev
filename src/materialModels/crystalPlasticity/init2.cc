@@ -298,6 +298,8 @@ void crystalPlasticity<dim>::init2(unsigned int num_quad_points)
   s_alpha_iter.resize(num_local_cells, std::vector<Vector<double> >(num_quad_points, s0_init));
   slipfraction_iter.resize(num_local_cells, std::vector<std::vector<double> >(num_quad_points, slip_init));
   slipfraction_conv.resize(num_local_cells, std::vector<std::vector<double> >(num_quad_points, slip_init));
+  slipSigned_iter.resize(num_local_cells, std::vector<std::vector<double> >(num_quad_points, slip_init));
+  slipSigned_conv.resize(num_local_cells, std::vector<std::vector<double> >(num_quad_points, slip_init));
   TwinOutputfraction_iter.resize(num_local_cells, std::vector<std::vector<double> >(num_quad_points, TwinOutput_init));
   TwinOutputfraction_conv.resize(num_local_cells, std::vector<std::vector<double> >(num_quad_points, TwinOutput_init));
   rot.resize(num_local_cells, std::vector<Vector<double> >(num_quad_points, rot_init));
