@@ -86,6 +86,9 @@ public:
   unsigned int numberOfNodalBCs;
   double nodalDisplacementBCsTolerance;
   std::string nodalDisplacement_BCfilename;
+  bool enableTabularNodalBCs;
+  std::vector<double> tabularTimeNodalBCs; 
+  std::vector<double> tabularAmpNodalBCs;
 
   bool enablePeriodicBCs,enableTabularPeriodicBCs; // Specify whether to use Periodic BCs or Tabular Periodic BCs
   double periodicTabularTime;

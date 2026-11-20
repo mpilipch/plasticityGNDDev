@@ -349,6 +349,42 @@ void ellipticBVP<dim>::init(){
 
 
     if(userInputs.enableNodalDisplacementBCs){
+      
+      std::ifstream BCfileNodal(userInputs.nodalDisplacement_BCfilename);
+      nodalDisplacement.resize(userInputs.numberOfNodalBCs,std::vector<double>(3,0));
+      dofNodalDisplacement.resize(userInputs.numberOfNodalBCs);
+      deluNodalDisplacement.resize(userInputs.numberOfNodalBCs);
+      refNodalDisplacement.resize(userInputs.numberOfNodalBCs);
+
+      //read data
+      if (BCfileNodal.is_open()){
+        pcout << "Reading Nodal boundary conditions\n";
+        for (unsigned int i=0; i<userInputs.numberOfNodalBCs; i++){
+          std::getline (BCfileNodal,line);
+          std::stringstream ss(line);
+          ss>>nodalDisplacement[i][0]>>nodalDisplacement[i][1]>>nodalDisplacement[i][2]>>dofNodalDisplacement[i];
+          ss>>totalU;
+          deluNodalDisplacement[i]=totalU/totalIncrements;
+          refNodalDisplacement[i]=totalU;
+        }
+      }
+
+      if(userInputs.enableTabularNodalBCs){
+        const auto &T = userInputs.tabularTimeNodalBCs;
+        const auto &A = userInputs.tabularAmpNodalBCs;
+        if (T.size()<2 || T.size()!=A.size()){
+          pcout << "Tabular nodal BCs: time and amplitude tables must have equal length >= 2\n"; exit(1);}
+        for (unsigned int k=1;k<T.size();k++) if (!(T[k]>T[k-1])){
+          pcout << "Tabular nodal BCs: time table must be strictly increasing\n"; exit(1);}
+        if (fabs(A[0])>1e-14 || fabs(T[0])>1e-14)
+          pcout << "Warning: tabular nodal BCs should start at (t=0, A=0); the first increment will jump\n";
+        if (T.back() < totalT - 1e-12*totalT)
+          pcout << "Warning: tabular nodal BC table ends before Total time; A is held constant after t_end\n";
+      }
+    }
+
+    /*
+    if(userInputs.enableNodalDisplacementBCs){
 
 
       std::ifstream BCfileNodal(userInputs.nodalDisplacement_BCfilename);
@@ -368,6 +404,7 @@ void ellipticBVP<dim>::init(){
         }
       }
     }
+*/
 
 // Isotropic Continuum
 //    if(userInputs.continuum_Isotropic){

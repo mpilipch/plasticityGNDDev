@@ -122,6 +122,9 @@ pcout (std::cout, dealii::Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)==0)
   numberOfNodalBCs=parameter_handler.get_integer("Number of Nodal Displacement BCs");
   nodalDisplacementBCsTolerance = parameter_handler.get_double("Tolerance for Nodal Displacement BCs");
   nodalDisplacement_BCfilename=parameter_handler.get("Nodal Displacement BCs filename");
+  enableTabularNodalBCs=parameter_handler.get_bool("Use Tabular Nodal Displacement BCs");
+  tabularTimeNodalBCs=dealii::Utilities::string_to_double(dealii::Utilities::split_string_list(parameter_handler.get("Tabular Time Table For Nodal Displacement BCs")));
+  tabularAmpNodalBCs=dealii::Utilities::string_to_double(dealii::Utilities::split_string_list(parameter_handler.get("Tabular Amplitude Table For Nodal Displacement BCs")));
 
   enablePeriodicBCs=parameter_handler.get_bool("Use Periodic BCs");
   Periodic_BCfilename=parameter_handler.get("Periodic Boundary condition Constraint filename");
@@ -412,7 +415,7 @@ pcout (std::cout, dealii::Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)==0)
     twinThresholdFraction2=parameter_handler.get_double("Twin Threshold Fraction 2");
     twinSaturationFactor2=parameter_handler.get_double("Twin Saturation Factor 2");
     twinShear2=parameter_handler.get_double("Characteristic Twin Shear 2");
-  
+
     if (gndOutputFlag){
         burgVecMags2 = dealii::Utilities::string_to_double(dealii::Utilities::split_string_list(parameter_handler.get("Burgers Vectors Phase 2")));
     }
@@ -481,7 +484,7 @@ pcout (std::cout, dealii::Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)==0)
       twinThresholdFraction3=parameter_handler.get_double("Twin Threshold Fraction 3");
       twinSaturationFactor3=parameter_handler.get_double("Twin Saturation Factor 3");
       twinShear3=parameter_handler.get_double("Characteristic Twin Shear 3");
-  
+
       if (gndOutputFlag){
           burgVecMags3 = dealii::Utilities::string_to_double(dealii::Utilities::split_string_list(parameter_handler.get("Burgers Vectors Phase 3")));
       }
@@ -551,7 +554,7 @@ pcout (std::cout, dealii::Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)==0)
         twinThresholdFraction4=parameter_handler.get_double("Twin Threshold Fraction 4");
         twinSaturationFactor4=parameter_handler.get_double("Twin Saturation Factor 4");
         twinShear4=parameter_handler.get_double("Characteristic Twin Shear 4");
-  
+
         if (gndOutputFlag){
             burgVecMags4 = dealii::Utilities::string_to_double(dealii::Utilities::split_string_list(parameter_handler.get("Burgers Vectors Phase 4")));
         }
@@ -639,6 +642,9 @@ void userInputParameters::declare_parameters(dealii::ParameterHandler & paramete
   parameter_handler.declare_entry("Number of Nodal Displacement BCs","1",dealii::Patterns::Integer(),"Number of Nodal Displacement BCs");
   parameter_handler.declare_entry("Tolerance for Nodal Displacement BCs","0",dealii::Patterns::Double(),"Tolerance for Nodal Displacement BCs: The ratio of defiend tolerance size to the Domain size");
   parameter_handler.declare_entry("Nodal Displacement BCs filename","NodalDisplacementBCs.txt",dealii::Patterns::Anything(),"File name containing Nodal Displacement BCs");
+  parameter_handler.declare_entry("Use Tabular Nodal Displacement BCs","false",dealii::Patterns::Bool(),"Flag to indicate whether to use Tabular Nodal BCs");
+  parameter_handler.declare_entry("Tabular Time Table For Nodal Displacement BCs","",dealii::Patterns::List(dealii::Patterns::Double()),"Table for Time intervals of Tabular Nodal BCs");
+  parameter_handler.declare_entry("Tabular Amplitude Table For Nodal Displacement BCs","",dealii::Patterns::List(dealii::Patterns::Double()),"Table for Time intervals of Tabular Torsion BCs");
 
   parameter_handler.declare_entry("Use Periodic BCs","false",dealii::Patterns::Bool(),"Flag to indicate whether to use periodic BCs");
   parameter_handler.declare_entry("Periodic Boundary condition Constraint filename","PeriodicBCsConstraints.txt",dealii::Patterns::Anything(),"File name containing Periodic Boundary condition Constraint");

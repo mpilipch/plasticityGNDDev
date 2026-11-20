@@ -62,6 +62,7 @@ protected:
 
   std::vector<unsigned int> global_vector_dof_Boundary_Layer2,dofNodalDisplacement;
   std::vector<double> deluNodalDisplacement,initPosIndenter,finalPosIndenter, prevPosIndenter, currentPosIndenter;
+  std::vector<double> refNodalDisplacement;
   std::vector<Point<dim>> KeyPosIndenter;
   double indenterSize, indenterTolerance, indenterLoad;// depthRefinementMultiple;
   unsigned int indenterShape, indenterFace, loadFace, indentDof, indentationKeyFrames;//, refinementFactor;

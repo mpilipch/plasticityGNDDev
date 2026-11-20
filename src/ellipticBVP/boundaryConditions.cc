@@ -1,6 +1,17 @@
 //methods to apply Dirichlet boundary conditons
 #include "../../include/ellipticBVP.h"
+#include <algorithm>
 
+namespace {
+  // piecewise-linear A(t); held constant outside the table
+  double tabularAmplitude(const std::vector<double>& T, const std::vector<double>& A, const double t){
+    if (t <= T.front()) return A.front();
+    if (t >= T.back())  return A.back();
+    const std::size_t k = std::upper_bound(T.begin(), T.end(), t) - T.begin();   // T[k-1] <= t < T[k]
+    const double w = (t - T[k-1])/(T[k] - T[k-1]);
+    return (1.0 - w)*A[k-1] + w*A[k];
+  }
+}
 //Specify Dirichlet boundary conditions
 template <int dim>
 void ellipticBVP<dim>::setBoundaryValues(const Point<dim>& node, const unsigned int dof, bool& flag, double& value){
@@ -139,12 +150,23 @@ void ellipticBVP<dim>::setBoundaryValues(const Point<dim>& node, const unsigned 
     if ((node[userInputs.torsionAxis] >= (userInputs.span[userInputs.torsionAxis]-externalMeshParameterBCs(userInputs.torsionAxis)))&&(dof==dof_2)){
                 flag=true; value=(node[dof_1]-userInputs.centerTorsion[0])*alpha_Torsion;}
   }
-
+ 
   if(userInputs.enableNodalDisplacementBCs){
     for (i=0;i<userInputs.numberOfNodalBCs;i++){
       if ((fabs(node[0]-nodalDisplacement[i][0])<= nodalDisplacementBCsToleranceVector(0))&&(fabs(node[1]-nodalDisplacement[i][1])<= nodalDisplacementBCsToleranceVector(1))&&(fabs(node[2]-nodalDisplacement[i][2])<= nodalDisplacementBCsToleranceVector(2))){
         if (dof==dofNodalDisplacement[i]){
-          flag=true; value=deluNodalDisplacement[i];return;
+          flag=true;
+          if (userInputs.enableTabularNodalBCs){
+            const double t0 = totalLoadFactor*delT;
+            const double t1 = (totalLoadFactor + loadFactorSetByModel)*delT;
+            const double dA = tabularAmplitude(userInputs.tabularTimeNodalBCs, userInputs.tabularAmpNodalBCs, t1)
+                            - tabularAmplitude(userInputs.tabularTimeNodalBCs, userInputs.tabularAmpNodalBCs, t0);
+            value = refNodalDisplacement[i]*dA/loadFactorSetByModel;   // applyDirichletBCs multiplies by loadFactorSetByModel
+          }
+          else{
+            value=deluNodalDisplacement[i];
+          }
+          return;
         }
       }
     }
