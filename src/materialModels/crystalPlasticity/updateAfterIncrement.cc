@@ -408,13 +408,6 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 						temp.push_back(rotnew_conv[cellID][q][1]);
 						temp.push_back(rotnew_conv[cellID][q][2]);
 
-						for (unsigned int tst=0; tst<n_slip_systems; tst++){
-							temp.push_back(slipfraction_conv[cellID][q][tst]);
-						}
-						for (unsigned int tst=0; tst<n_slip_systems; tst++){
-							temp.push_back(slipSigned_conv[cellID][q][tst]);
-						}
-/*
 						temp.push_back(Fe_conv[cellID][q][0][0]);
 						temp.push_back(Fe_conv[cellID][q][1][1]);
 						temp.push_back(Fe_conv[cellID][q][2][2]);
@@ -640,7 +633,7 @@ void crystalPlasticity<dim>::updateAfterIncrement()
 							temp.push_back(stateVar_conv[cellID][q][49]);
 							temp.push_back(stateVar_conv[cellID][q][50]);
 						}
-*/			
+
 						if(this->userInputs.gndOutputFlag){
 							temp.push_back(gndDensity[cellID][q]);
 
